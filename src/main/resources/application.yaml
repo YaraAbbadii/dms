@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: dms
+
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/database_management
+    username: dms
+    password: dms
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+
