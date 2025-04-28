@@ -30,7 +30,7 @@ public class EmployeeMapper {
         employeeDTO.setDepartmentDTO(departmentDTO);
 
         ProjectDTO projectDTO = ProjectMapper.toProjectDTO(employeeEntity.getProjectEntities().getFirst());
-        employeeDTO.setProjectDTO(List.of(projectDTO));
+        employeeDTO.setProjectDTOList(List.of(projectDTO));
 
         return employeeDTO;
     }
@@ -51,7 +51,7 @@ public class EmployeeMapper {
         employeeEntity.setDepartmentEntity(departmentEntity);
 
 
-        List<ProjectEntity> projectEntityList = ProjectMapper.toProjectEntityList(employeeDTO.getProjectDTO());
+        List<ProjectEntity> projectEntityList = ProjectMapper.toProjectEntityList(employeeDTO.getProjectDTOList());
         employeeEntity.setProjectEntities(projectEntityList);
         return employeeEntity;
     }

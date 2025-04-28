@@ -3,6 +3,7 @@ package com.example.dms.controller;
 import com.example.dms.DTO.EmployeeDTO;
 import com.example.dms.data.GeneralResponse;
 import com.example.dms.service.EmployeeService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,17 +21,17 @@ public class EmployeeController {
     }
 
     @GetMapping("/get_projection")
-    public GeneralResponse getSomeData(){
+    public GeneralResponse getSomeData() {
         return employeeService.getSomeData();
     }
 
     @GetMapping("get/{id}")
-    public GeneralResponse getEmployeeById(@PathVariable Long id){
+    public GeneralResponse getEmployeeById(@PathVariable Long id) {
         return employeeService.getEmployeeById(id);
     }
 
     @PostMapping("/create")
-    public GeneralResponse createEmployee(@RequestBody EmployeeDTO employeeDTO) {
+    public GeneralResponse createEmployee(@Valid @RequestBody EmployeeDTO employeeDTO) {
         return employeeService.createEmployee(employeeDTO);
     }
 
@@ -38,7 +39,6 @@ public class EmployeeController {
     public GeneralResponse updateEmployee(@PathVariable Long id, @RequestBody EmployeeDTO employeeDTO) {
         return employeeService.updateEmployee(id, employeeDTO);
     }
-
 
     @DeleteMapping("/{id}")
     public void deleteEmployee(@PathVariable Long id) {

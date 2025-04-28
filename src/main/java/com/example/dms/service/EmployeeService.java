@@ -7,6 +7,7 @@ import com.example.dms.entity.DepartmentEntity;
 import com.example.dms.entity.EmployeeEntity;
 import com.example.dms.entity.ProjectEntity;
 import com.example.dms.exception.ResourceNotFoundException;
+import com.example.dms.infrastructure.exception.UndefinedException;
 import com.example.dms.mapper.AddressMapper;
 import com.example.dms.mapper.DepartmentMapper;
 import com.example.dms.mapper.EmployeeMapper;
@@ -17,10 +18,10 @@ import com.example.dms.repository.DepartmentRepository;
 import com.example.dms.repository.EmployeeRepository;
 import com.example.dms.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +31,7 @@ public class EmployeeService {
     private final DepartmentRepository departmentRepository;
     private final ProjectRepository projectRepository;
     private final AddressRepository addressRepository;
+    private final MessageSource messageSource;
 
 
     public GeneralResponse getEmployeeById(Long id) {
@@ -60,10 +62,7 @@ public class EmployeeService {
         DepartmentEntity departmentEntity = DepartmentMapper.toDepartmentEntity(employeeDTO.getDepartmentDTO());
         departmentRepository.saveAndFlush(departmentEntity);
 
-//        ProjectEntity projectEntity = ProjectMapper.toProjectEntity(employeeDTO.getProjectDTO());
-//        projectRepository.saveAndFlush(projectEntity);
-
-        List<ProjectEntity> projectEntityList = ProjectMapper.toProjectEntityList(employeeDTO.getProjectDTO());
+        List<ProjectEntity> projectEntityList = ProjectMapper.toProjectEntityList(employeeDTO.getProjectDTOList());
         projectRepository.saveAllAndFlush(projectEntityList);
 
         EmployeeEntity employeeEntity = EmployeeMapper.toEmployeeEntity(employeeDTO);
@@ -75,7 +74,7 @@ public class EmployeeService {
         EmployeeEntity savedEmployeeEntity = employeeRepository.saveAndFlush(employeeEntity);
         EmployeeDTO employeeResponse = EmployeeMapper.toEmployeeDTO(savedEmployeeEntity);
 
-        return new GeneralResponse().success(employeeResponse);
+        throw new UndefinedException("Undefined");
     }
 
     public GeneralResponse updateEmployee(Long id, EmployeeDTO updatedEmployeeDTO) {
