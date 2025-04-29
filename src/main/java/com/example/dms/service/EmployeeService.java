@@ -74,7 +74,8 @@ public class EmployeeService {
         EmployeeEntity savedEmployeeEntity = employeeRepository.saveAndFlush(employeeEntity);
         EmployeeDTO employeeResponse = EmployeeMapper.toEmployeeDTO(savedEmployeeEntity);
 
-        throw new UndefinedException("Undefined");
+//        throw new UndefinedException("Undefined");
+        return new GeneralResponse().success(employeeResponse);
     }
 
     public GeneralResponse updateEmployee(Long id, EmployeeDTO updatedEmployeeDTO) {
