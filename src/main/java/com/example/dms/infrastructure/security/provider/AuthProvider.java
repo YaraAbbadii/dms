@@ -1,7 +1,7 @@
 package com.example.dms.infrastructure.security.provider;
 
 import com.example.dms.infrastructure.exception.UndefinedException;
-import com.example.dms.infrastructure.security.service.DmsUserDetailsService;
+import com.example.dms.infrastructure.security.service.MyUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class AuthProvider implements AuthenticationProvider {
 
-    private final DmsUserDetailsService dmsUserDetailsService;
+    private final MyUserDetailsService myUserDetailsService;
     private final PasswordEncoder passwordEncoder;
 
     /**
@@ -27,7 +27,7 @@ public class AuthProvider implements AuthenticationProvider {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String userName = authentication.getName();
         String password = authentication.getCredentials().toString();
-        UserDetails userDetails = dmsUserDetailsService.loadUserByUsername(userName);
+        UserDetails userDetails = myUserDetailsService.loadUserByUsername(userName);
         if(!passwordEncoder.matches(password, userDetails.getPassword())){
             throw new UndefinedException("Bad credentials");
         }

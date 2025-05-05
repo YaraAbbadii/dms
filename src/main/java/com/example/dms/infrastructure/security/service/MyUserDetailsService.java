@@ -1,22 +1,18 @@
 package com.example.dms.infrastructure.security.service;
 
-import com.example.dms.infrastructure.exception.UndefinedException;
 import com.example.dms.infrastructure.security.domain.UserEntity;
+import com.example.dms.infrastructure.security.jwt.data.MyUserDetails;
 import com.example.dms.infrastructure.security.repository.UserRepository;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
-public class DmsUserDetailsService implements UserDetailsService {
-
-
+public class MyUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 
     /**
@@ -26,10 +22,7 @@ public class DmsUserDetailsService implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<UserEntity> userEntity = userRepository.findByUserName(username);
-        if(userEntity.isEmpty()){
-            throw new UndefinedException("User not found");
-        }
-        return userEntity.get();
+        UserEntity user = userRepository.findByUserName(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return new MyUserDetails(user);
     }
 }

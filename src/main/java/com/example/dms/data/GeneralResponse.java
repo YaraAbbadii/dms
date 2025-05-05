@@ -11,6 +11,12 @@ public class GeneralResponse {
     private boolean success;
     private Object data;
 
+    public GeneralResponse(boolean b, String loginSuccessful, String jwt) {
+        this.success = b;
+        this.message = loginSuccessful;
+        this.data = jwt;
+    }
+
     public GeneralResponse success(Object result) {
         this.statusCode = 200;
         this.success = true;

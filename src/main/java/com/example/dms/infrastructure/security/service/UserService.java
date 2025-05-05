@@ -7,9 +7,14 @@ import com.example.dms.infrastructure.security.data.request.LoginRequest;
 import com.example.dms.infrastructure.security.data.response.CreateResponse;
 import com.example.dms.infrastructure.security.data.response.LoginResponse;
 import com.example.dms.infrastructure.security.domain.UserEntity;
+import com.example.dms.infrastructure.security.jwt.data.JwtUtil;
 import com.example.dms.infrastructure.security.mapping.UserMapper;
 import com.example.dms.infrastructure.security.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,7 +24,9 @@ import org.springframework.stereotype.Service;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final DmsUserDetailsService dmsUserDetailsService;
+    private final MyUserDetailsService myUserDetailsService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
 
     public GeneralResponse allUsers() {
         return new GeneralResponse().success(userRepository.findAll());
@@ -30,13 +37,25 @@ public class UserService {
     }
 
     public GeneralResponse login(LoginRequest loginRequest) {
-        UserDetails userDetails = dmsUserDetailsService.loadUserByUsername(loginRequest.getUserName());
-        if (!passwordEncoder.matches(loginRequest.getPassword(), userDetails.getPassword())) {
-            throw new UndefinedException("Bad credentials");
-        }
-        LoginResponse loginResponse = UserMapper.toLoginResponse(userDetails);
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getUserName(),
+                        loginRequest.getPassword()
+                )
+        );
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String jwt = jwtUtil.generateToken(userDetails.getUsername());
+
+        LoginResponse loginResponse = new LoginResponse();
+        loginResponse.setToken(jwt);
+        loginResponse.setUsername(userDetails.getUsername());
+        loginResponse.setRole(userDetails.getAuthorities().stream()
+                .findFirst()
+                .map(GrantedAuthority::getAuthority)
+                .orElse("USER")); // default if no roles found
         return new GeneralResponse().success(loginResponse);
     }
+
 
     public GeneralResponse createUser(UserDTO userDTO) {
         UserEntity entity = UserMapper.toUserEntity(userDTO);
@@ -47,20 +66,25 @@ public class UserService {
     }
 
     public GeneralResponse updateUser(Long id, UserDTO userDTO) {
-        return userRepository.findById(id).map(userUpdated -> {
-            userUpdated.setId(userDTO.getId());
-            userUpdated.setUserName(userDTO.getUserName());
-            userUpdated.setPassword(userDTO.getPassword());
-            userUpdated.setRole(userDTO.getRole());
-            userRepository.save(userUpdated);
-            return new GeneralResponse().success(userUpdated);
+        return userRepository.findById(id).map(user -> {
+            user.setUserName(userDTO.getUsername());
+            user.setPassword(passwordEncoder.encode(userDTO.getPassword())); // encode updated password
+            user.setRole(userDTO.getRole());
+
+            userRepository.save(user);
+
+            return new GeneralResponse().success(UserMapper.toCreateResponse(user));
         }).orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    public void deleteUser(Long id) {
-        UserEntity userEntity = userRepository.findById(id)
+    public GeneralResponse deleteUser(Long id) {
+        UserEntity user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found!"));
-        userRepository.delete(userEntity);
+
+        userRepository.delete(user);
+
+        return new GeneralResponse().success("User with ID " + id + " deleted successfully");
     }
+
 
 }

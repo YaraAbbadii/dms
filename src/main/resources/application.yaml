@@ -2,14 +2,18 @@ spring:
   application:
     name: dms
 
-
   datasource:
     url: jdbc:postgresql://localhost:5432/dms
     username: dms
     password: dms
     driver-class-name: org.postgresql.Driver
+
   jpa:
     show-sql: true
     hibernate:
       ddl-auto: update
 
+  security:
+    jwt:
+      secret: "7b0e7c1dc5411cb049f4f84e2c0d7ebbf1b1dca311c8e3311be9057282f7292f48600a6f9c458e65c1428ef0cef9a617c2a84cc3e3a6fbe46b80bf39f096093c44c620c8623377d8e58e60fe5700ba63eb13edf8773540d5a08bfc8e84545144348af6494864b6be7ee507c96e3a738afbcdc7a9147ee07c90f5370b151c1f5e77c017a373aa6cceeac9a8b661986a866bb44d8f263cff93f9aebfb300db1a761d9c098f0d1e2a0494776044e3994d1214d1cb734fb41d50c1296516b2e6e84e542cd9e61e5f31e614b0a2239c5c58d95b131c38b0ef91edd1e0a0ca10cd0c262086fcb16dfeed5d99247f32fa61fb3ffde097b9d41335d6f9eb66dd0ef10361"
+      expirationMs: 3600000
